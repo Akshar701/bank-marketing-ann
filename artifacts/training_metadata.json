@@ -1,0 +1,34 @@
+{
+    "Logistic Regression": {
+        "time": 0.027585983276367188,
+        "path": "models/logistic_regression.joblib"
+    },
+    "Random Forest": {
+        "time": 0.3372941017150879,
+        "path": "models/random_forest.joblib"
+    },
+    "XGBoost": {
+        "time": 0.15923380851745605,
+        "path": "models/xgboost.joblib"
+    },
+    "Baseline ANN": {
+        "time": 88.09992909431458,
+        "path": "models/baseline_ann.keras"
+    },
+    "Medium ANN": {
+        "time": 84.90931677818298,
+        "path": "models/medium_ann.keras"
+    },
+    "Advanced ANN": {
+        "time": 90.6354649066925,
+        "path": "models/advanced_ann.keras"
+    },
+    "Pre-call ANN (No Duration)": {
+        "time": 72.56559300422668,
+        "path": "models/precall_ann.keras"
+    },
+    "Pre-call XGBoost (No Duration)": {
+        "time": 0.1469440460205078,
+        "path": "models/precall_xgboost.joblib"
+    }
+}

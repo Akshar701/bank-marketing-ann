@@ -1,0 +1,87 @@
+data:
+  raw_path: "data/bank-full.csv"
+  delimiter: ";"
+  target_column: "y"
+  positive_class: "yes"
+  negative_class: "no"
+  numerical_features:
+    - "age"
+    - "balance"
+    - "day"
+    - "duration"
+    - "campaign"
+    - "pdays"
+    - "previous"
+  categorical_features:
+    - "job"
+    - "marital"
+    - "education"
+    - "default"
+    - "housing"
+    - "loan"
+    - "contact"
+    - "month"
+    - "poutcome"
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  random_state: 42
+
+training:
+  early_stopping_patience: 8
+  reduce_lr_patience: 4
+  reduce_lr_factor: 0.5
+  min_lr: 0.00001
+  default_threshold: 0.5
+
+models:
+  baseline_ann:
+    units: [64]
+    learning_rate: 0.001
+    batch_size: 64
+    epochs: 30
+  medium_ann:
+    units: [128, 64]
+    dropout: 0.3
+    learning_rate: 0.001
+    batch_size: 64
+    epochs: 35
+  advanced_ann:
+    units: [256, 128, 64]
+    dropout: [0.3, 0.2]
+    batch_norm: true
+    learning_rate: 0.0008
+    batch_size: 64
+    epochs: 40
+  logistic_regression:
+    C: 1.0
+    max_iter: 1000
+    class_weight: "balanced"
+    solver: "lbfgs"
+  random_forest:
+    n_estimators: 150
+    max_depth: 12
+    min_samples_split: 5
+    min_samples_leaf: 2
+    class_weight: "balanced"
+  xgboost:
+    n_estimators: 150
+    max_depth: 6
+    learning_rate: 0.08
+    subsample: 0.8
+    colsample_bytree: 0.8
+
+tuning:
+  n_trials: 15
+  metric: "val_pr_auc"
+
+cost_matrix:
+  false_negative_cost: 100.0  # Missing an interested subscriber
+  false_positive_cost: 15.0   # Unnecessary outbound telemarketing call
+  true_positive_benefit: 200.0 # Customer opens term deposit
+
+paths:
+  models_dir: "models"
+  artifacts_dir: "artifacts"
+  reports_dir: "reports"
+  figures_dir: "reports/figures"

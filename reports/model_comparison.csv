@@ -1,0 +1,10 @@
+Model,Type,Features,Accuracy (0.5),Precision (0.5),Recall (0.5),F1-Score (0.5),ROC-AUC,PR-AUC,Balanced Acc (0.5),Specificity (0.5),Brier Score,Val-Optimized Thresh,F1-Score (Opt Thresh),Recall (Opt Thresh),Precision (Opt Thresh),Training Time (s),Inference Latency (ms/1k)
+Advanced ANN,Artificial Neural Network,16 (Full),0.9049,0.6095,0.5195,0.5609,0.9241,0.6004,0.7377,0.9559,0.0646,0.327,0.6131,0.7213,0.5331,90.64,63.1
+XGBoost,Traditional ML,16 (Full),0.8545,0.4374,0.855,0.5787,0.9263,0.5983,0.8547,0.8544,0.0986,0.693,0.6235,0.7465,0.5353,0.16,0.49
+Medium ANN,Artificial Neural Network,16 (Full),0.903,0.5997,0.512,0.5524,0.9242,0.5979,0.7334,0.9548,0.0649,0.337,0.606,0.7301,0.5179,84.91,50.02
+Tuned ANN,Artificial Neural Network,16 (Full),0.9049,0.6149,0.4994,0.5511,0.9218,0.5923,0.729,0.9586,0.0655,0.307,0.6049,0.7364,0.5132,0.0,57.28
+Baseline ANN,Artificial Neural Network,16 (Full),0.9056,0.6344,0.4552,0.5301,0.9201,0.5897,0.7103,0.9653,0.066,0.287,0.6025,0.7188,0.5187,88.1,47.86
+Random Forest,Traditional ML,16 (Full),0.8394,0.41,0.8499,0.5531,0.9183,0.5873,0.844,0.838,0.1098,0.663,0.5896,0.6494,0.5398,0.34,13.46
+Logistic Regression,Traditional ML,16 (Full),0.8424,0.4117,0.8108,0.5461,0.9047,0.5261,0.8287,0.8466,0.1212,0.663,0.5678,0.681,0.4869,0.03,0.09
+Pre-call XGBoost (No Duration),Traditional ML,15 (No Duration),0.8248,0.3564,0.6179,0.452,0.7933,0.4624,0.7351,0.8522,0.1484,0.634,0.4969,0.5069,0.4873,0.15,0.46
+Pre-call ANN (No Duration),Artificial Neural Network,15 (No Duration),0.8937,0.5896,0.2989,0.3967,0.791,0.441,0.6357,0.9724,0.0821,0.208,0.4917,0.5259,0.4618,72.57,35.29
