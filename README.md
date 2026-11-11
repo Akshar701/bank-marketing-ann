@@ -4,9 +4,40 @@
 [![Keras 3](https://img.shields.io/badge/Keras-3.0+-red.svg)](https://keras.io/)
 [![XGBoost](https://img.shields.io/badge/XGBoost-Ensemble-orange.svg)](https://xgboost.readthedocs.io/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B.svg)](https://streamlit.io/)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Akshar701/bank-marketing-ann/blob/main/notebooks/colab_quickstart.ipynb)
 [![Tests Passing](https://img.shields.io/badge/pytest-14%20passed-green.svg)](https://pytest.org/)
 
 A production-grade, end-to-end Machine Learning and Deep Learning system built on the official [UCI Bank Marketing Benchmark](https://archive.ics.uci.edu/dataset/222/bank+marketing) (`bank-full.csv`, 45,211 rows). This project rigorously benchmarks traditional machine learning algorithms against multiple Artificial Neural Network (ANN) architectures, investigates ex-post target leakage, addresses severe class imbalance, optimizes decision thresholds, evaluates probability calibration, provides model explainability (SHAP & Permutation Importance), and deploys an interactive financial analytics Streamlit dashboard.
+
+---
+
+## 🤝 Teammate Collaboration & Google Colab Quickstart
+
+Welcome teammates! You can run and collaborate on this project in two ways:
+
+### Option A: 1-Click Cloud Execution (Google Colab)
+No local setup required. Click below to open interactive notebooks with pretrained models and live customer inference:
+- **🚀 [Colab Quickstart Notebook](https://colab.research.google.com/github/Akshar701/bank-marketing-ann/blob/main/notebooks/colab_quickstart.ipynb):** 2-minute walkthrough of model predictions, leakage comparison, and benchmark figures.
+- **📊 [Full EDA & Experimentation Notebook](https://colab.research.google.com/github/Akshar701/bank-marketing-ann/blob/main/notebooks/eda_and_experiments.ipynb):** Complete exploratory data analysis and architecture benchmarking.
+
+### Option B: Local Setup & Dashboard
+```bash
+# 1. Clone repository
+git clone https://github.com/Akshar701/bank-marketing-ann.git
+cd bank-marketing-ann
+
+# 2. Create virtual environment & install requirements
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+
+# 3. Launch the Streamlit Web Application
+streamlit run app.py
+```
+Open your browser at `http://localhost:8501`.
+
+> 💡 **Contributing:** See our [CONTRIBUTING.md](CONTRIBUTING.md) guide for branch naming conventions, PR guidelines, and running tests.
+
 
 ---
 

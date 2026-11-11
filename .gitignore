@@ -39,8 +39,10 @@ ehthumbs.db
 Thumbs.db
 
 # Dataset (UCI Bank Marketing full CSV)
-data/*.csv
+# Allow official bank-full.csv for team clone & Google Colab reproduction
+!data/bank-full.csv
 data/*.zip
+
 
 # Pytest & testing caches
 .pytest_cache/
