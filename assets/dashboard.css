@@ -1,0 +1,68 @@
+.stApp { background: #f7f8fa; color: #172c29; }
+/* Streamlit can retain the browser's dark theme. Pair widget foregrounds
+   and surfaces explicitly so that the fixed light dashboard stays legible. */
+[data-testid="stRadio"] label,
+[data-testid="stRadio"] label p,
+[data-testid="stCheckbox"] label p,
+[data-testid="stTabs"] [role="tab"],
+[data-testid="stMetric"] label,
+[data-testid="stMetricValue"] { color: #172c29 !important; }
+[data-baseweb="input"],
+[data-baseweb="input"] > div,
+[data-baseweb="base-input"],
+[data-baseweb="select"] > div,
+[data-baseweb="textarea"] { background-color: #eef2f1 !important; color: #172c29 !important; }
+[data-baseweb="input"] input,
+[data-baseweb="select"] input,
+[data-baseweb="select"] [role="combobox"],
+[data-baseweb="textarea"] textarea { color: #172c29 !important; -webkit-text-fill-color: #172c29 !important; caret-color: #172c29; }
+[data-baseweb="select"] > div > div { color: #172c29 !important; }
+[data-baseweb="select"] svg { fill: #385447 !important; }
+[data-baseweb="popover"] [role="listbox"],
+[data-baseweb="popover"] [role="option"] { background: #fff !important; color: #172c29 !important; }
+[data-baseweb="popover"] [role="option"]:hover,
+[data-baseweb="popover"] [role="option"][aria-selected="true"] { background: #e7f2ed !important; }
+[data-testid="stNumberInput"] button { background: #eef2f1 !important; color: #172c29 !important; }
+[data-testid="stCaptionContainer"] p { color: #52695f !important; }
+.block-container { max-width: 1440px; padding-top: 2.5rem; padding-bottom: 4rem; }
+h1 { font-size: 2.3rem !important; letter-spacing: -1.3px; font-weight: 700 !important; }
+h2, h3 { letter-spacing: -.5px; }
+h1, h2, h3, h4, h5, h6, [data-testid="stWidgetLabel"], [data-testid="stSidebar"] label { color: #172c29 !important; }
+.hero h2 { color: #fff !important; }
+[data-testid="stSidebar"] p { color: #385447; }
+[data-testid="stSidebar"] { background: #fff; border-right: 1px solid #e4e9e7; }
+[data-testid="stSidebar"] > div:first-child { padding-top: 2.5rem; }
+.brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+.brand-mark { background: #15745b; color: white; border-radius: 12px; padding: 10px 14px; font-size: 22px; font-weight: 800; }
+.brand-name { font-size: 23px; font-weight: 750; letter-spacing: -1px; }
+.brand-sub { font-size: 11px; color: #70827b; letter-spacing: 1.5px; text-transform: uppercase; }
+[data-testid="stSidebar"] [role="radiogroup"] { gap: 8px; }
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p { font-size: 14px; }
+[data-testid="stSidebar"] label[data-baseweb="radio"] { padding: 10px 12px; border-radius: 8px; }
+[data-testid="stSidebar"] label[data-baseweb="radio"]:has(input:checked) { background: #e7f2ed; }
+.eyebrow { color: #15745b; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+.hero { background: #113e34; padding: 32px 36px; border-radius: 16px; margin: 16px 0 24px; position: relative; overflow: hidden; }
+.hero::after { content: ''; position: absolute; right: -45px; top: -85px; width: 320px; height: 320px; border: 45px solid #ffffff08; border-radius: 50%; pointer-events: none; }
+.hero h2 { color: #fff; max-width: 700px; font-size: 30px; margin: 0 0 8px; padding: 0; }
+.hero p { color: #c1d8cd; max-width: 630px; line-height: 1.7; margin: 0; }
+.hero .eyebrow { color: #b7e8ca; }
+.metric-card { background: #fff; border: 1px solid #e1e8e4; border-radius: 12px; padding: 22px; min-height: 145px; margin-bottom: 12px; }
+.metric-title { color: #657970; font-size: 12px; font-weight: 600; margin-bottom: 14px; }
+.metric-value { font-size: 30px; font-weight: 700; letter-spacing: -1px; color: #173e31; }
+.metric-sub { color: #708278; font-size: 12px; margin-top: 8px; }
+.section-header { font-size: 19px; font-weight: 650; margin: 24px 0 16px; }
+.leakage-box { border-left: 3px solid #c79943; background: #faf4e6; color: #66542d; padding: 16px 20px; border-radius: 6px; margin: 20px 0; line-height: 1.6; font-size: 14px; }
+.side-note { border: 1px solid #e1e8e4; padding: 16px; border-radius: 10px; margin-top: 32px; font-size: 13px; line-height: 1.8; color: #607269; }
+.side-note strong { color: #173e31; }
+[data-testid="stForm"], [data-testid="stPlotlyChart"] { background: #fff; border: 1px solid #e1e8e4; border-radius: 12px; padding: 16px; }
+[data-testid="stFormSubmitButton"] button { background: #15745b; color: white; border: 0; min-height: 46px; }
+.stButton button, .stDownloadButton button { border-radius: 8px; min-height: 42px; }
+[data-testid="stMetric"] { background: #fff; padding: 18px; border: 1px solid #e1e8e4; border-radius: 10px; }
+[data-testid="stTabs"] [role="tablist"] { gap: 24px; }
+[data-testid="stCaptionContainer"] { color: #687d73; }
+@media (max-width: 700px) {
+  .block-container { padding: 1.5rem 1rem; }
+  .hero { padding: 24px; }
+  .hero h2 { font-size: 24px; }
+  h1 { font-size: 1.8rem !important; }
+}

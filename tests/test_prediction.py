@@ -81,3 +81,17 @@ def test_batch_prediction():
     assert "predicted_subscription" in out_df.columns
     assert len(out_df) == 10
     assert not out_df["subscription_probability"].isnull().any()
+
+
+def test_logistic_regression_probability_matches_binary_logit():
+    """Serialized binary models work across the multi_class API change."""
+    from scipy.special import expit
+
+    if not os.path.exists("models/logistic_regression.joblib"):
+        pytest.skip("Logistic regression artifact is not available")
+    predictor = BankPredictor()
+    result = predictor.predict(SAMPLE_CUSTOMER, model_name="Logistic Regression")
+    model, _ = predictor.get_model("Logistic Regression")
+    features = predictor._preprocessors["full"].transform(pd.DataFrame([SAMPLE_CUSTOMER]))
+    expected = float(expit(model.decision_function(features))[0])
+    assert result["probability"] == pytest.approx(expected)

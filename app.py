@@ -3,7 +3,10 @@ Bank Marketing Subscription Prediction - Streamlit Analytics Dashboard & Predict
 Built with Streamlit, Plotly, Scikit-Learn, and Keras 3.
 """
 import os
+from pathlib import Path
+from html import escape
 import json
+import hashlib
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -12,105 +15,31 @@ import plotly.graph_objects as go
 
 # Set page configuration
 st.set_page_config(
-    page_title="Bank Term Deposit Prediction | Enterprise ANN System",
-    page_icon="🏦",
+    page_title="Verdant | Campaign Intelligence",
+    page_icon="V",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom modern CSS for glassmorphism, responsive cards, and premium typography
-st.markdown("""
-<style>
-    /* Main container styling */
-    .stApp {
-        background: radial-gradient(circle at 10% 20%, #0f172a 0%, #020617 90%);
-        color: #f8fafc;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    
-    /* Metric Cards */
-    .metric-card {
-        background: rgba(30, 41, 59, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 18px 22px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        backdrop-filter: blur(8px);
-        margin-bottom: 12px;
-        transition: transform 0.2s ease;
-    }
-    .metric-card:hover {
-        transform: translateY(-3px);
-        border-color: rgba(56, 189, 248, 0.4);
-    }
-    .metric-title {
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #94a3b8;
-        margin-bottom: 6px;
-    }
-    .metric-value {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: #38bdf8;
-    }
-    .metric-sub {
-        font-size: 0.8rem;
-        color: #64748b;
-        margin-top: 4px;
-    }
+# Keep the presentation layer separate from prediction logic.
+st.markdown(f"<style>{(Path(__file__).parent / 'assets/dashboard.css').read_text(encoding='utf-8')}</style>", unsafe_allow_html=True)
 
-    /* Badges */
-    .badge-primary {
-        background-color: #0369a1;
-        color: #e0f2fe;
-        padding: 3px 10px;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-block;
-    }
-    .badge-warning {
-        background-color: #b45309;
-        color: #fef3c7;
-        padding: 3px 10px;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-block;
-    }
-    .badge-success {
-        background-color: #047857;
-        color: #d1fae5;
-        padding: 3px 10px;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-block;
-    }
 
-    /* Leakage Alert Box */
-    .leakage-box {
-        background: rgba(180, 83, 9, 0.15);
-        border-left: 4px solid #f59e0b;
-        border-radius: 8px;
-        padding: 14px 18px;
-        margin: 15px 0;
-    }
+def chart_style(fig, height=330):
+    fig.update_layout(template="plotly_white", height=height,
+                      font=dict(family="Arial, sans-serif", color="#3e5b4e"),
+                      paper_bgcolor="white", plot_bgcolor="white",
+                      margin=dict(l=16, r=20, t=24, b=20))
+    fig.update_xaxes(tickfont=dict(color="#3e5b4e"), title_font=dict(color="#3e5b4e"), automargin=True)
+    fig.update_yaxes(tickfont=dict(color="#3e5b4e"), title_font=dict(color="#3e5b4e"), automargin=True)
+    fig.update_layout(legend_font_color="#3e5b4e")
+    fig.update_annotations(font_color="#173e31")
+    return fig
 
-    /* Subheader */
-    .section-header {
-        font-size: 1.3rem;
-        font-weight: 600;
-        color: #f1f5f9;
-        margin-top: 20px;
-        margin-bottom: 12px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding-bottom: 6px;
-    }
-</style>
-""", unsafe_allow_html=True)
+
+def navigate(page):
+    st.session_state["navigation"] = page
+
 
 # Helper function to load data and results
 @st.cache_data
@@ -134,125 +63,58 @@ def get_predictor():
     return BankPredictor()
 
 # --- SIDEBAR NAVIGATION ---
-st.sidebar.image("https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=400&q=80", use_container_width=True)
-st.sidebar.title("🏦 Bank Marketing AI")
-st.sidebar.caption("Enterprise Artificial Neural Network System")
+st.sidebar.markdown('<div class="brand"><div class="brand-mark">v.</div><div><div class="brand-name">verdant</div><div class="brand-sub">Campaign intelligence</div></div></div>', unsafe_allow_html=True)
+pages = ["Overview", "Customer prediction", "Model comparison", "Explainability", "Batch scoring", "Data & methodology"]
+choice = st.sidebar.radio("WORKSPACE", pages, key="navigation")
+st.sidebar.markdown('<div class="side-note"><strong>Bank marketing research</strong><br>45,211 customer records<br>UCI Bank Marketing dataset<br>Historical benchmark · 9 models</div>', unsafe_allow_html=True)
+st.sidebar.caption("Research workspace / v2.0")
+st.markdown('<div class="eyebrow">WORKSPACE / ' + choice.upper() + '</div>', unsafe_allow_html=True)
 
-pages = [
-    "🚀 Project Overview",
-    "🎯 Customer Prediction",
-    "📊 Model Comparison",
-    "🔍 Explainability & SHAP",
-    "📁 Batch Prediction",
-    "📖 Dataset & Architecture"
-]
-
-choice = st.sidebar.radio("Navigate Dashboard", pages)
-
-st.sidebar.markdown("---")
-st.sidebar.markdown("**Dataset:** UCI Bank Marketing (`bank-full.csv`)")
-st.sidebar.markdown("**Instances:** 45,211 | **Features:** 16")
-st.sidebar.markdown("**Imbalance Ratio:** 7.55 : 1")
-st.sidebar.markdown("---")
-st.sidebar.caption("Antigravity ML System v1.0.0 | Academic & Production Ready")
-
-# ==============================================================================
-# PAGE 1: PROJECT OVERVIEW
-# ==============================================================================
-if choice == "🚀 Project Overview":
-    st.title("🏦 Bank Marketing Term Deposit Prediction")
-    st.markdown("### Production End-to-End Artificial Neural Network & ML System")
-    st.markdown("""
-    This project provides a comprehensive machine learning system designed to predict whether bank clients will subscribe to a 
-    long-term financial deposit product (`y` = `yes` / `no`) during direct telemarketing campaigns. 
-    By contrasting deep feed-forward neural networks with tuned traditional models, optimizing decision thresholds, and analyzing target leakage, 
-    the system assists marketing teams in maximizing deposit acquisition while minimizing wasted customer outreach.
-    """)
-
-    # Top KPI summary cards
+if choice == "Overview":
+    st.title("Campaign overview")
+    st.caption("Understand your audience. Compare your models. Make more informed calls.")
+    st.markdown('<div class="hero"><div class="eyebrow">FROM DATA TO DECISIONS</div><h2>Find the potential in every conversation.</h2><p>Explore subscription patterns and estimate customer interest with your trained bank marketing models.</p></div>', unsafe_allow_html=True)
+    a, b, _ = st.columns([1.4, 1.4, 3])
+    a.button("Score a customer →", on_click=navigate, args=("Customer prediction",), use_container_width=True, type="primary")
+    b.button("Upload a lead list →", on_click=navigate, args=("Batch scoring",), use_container_width=True)
     df_comp = load_comparison_data()
-    best_model_name = df_comp.iloc[0]["Model"] if df_comp is not None else "Medium ANN"
-    best_prauc = df_comp.iloc[0]["PR-AUC"] if df_comp is not None else 0.58
-    best_rocauc = df_comp.iloc[0]["ROC-AUC"] if df_comp is not None else 0.93
-
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-title">Total Observations</div>
-            <div class="metric-value">45,211</div>
-            <div class="metric-sub">Semicolon-delimited records</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with col2:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-title">Subscription Imbalance</div>
-            <div class="metric-value">11.7%</div>
-            <div class="metric-sub">5,289 Yes vs 39,922 No</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with col3:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-title">Best Overall Model</div>
-            <div class="metric-value" style="font-size: 1.4rem;">{best_model_name}</div>
-            <div class="metric-sub">Evaluated on untouched test set</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with col4:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-title">Peak Test PR-AUC</div>
-            <div class="metric-value">{best_prauc:.3f}</div>
-            <div class="metric-sub">ROC-AUC: {best_rocauc:.3f}</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    # Duration Leakage Notice
-    st.markdown("""
-    <div class="leakage-box">
-        <strong>⚠️ Crucial Target Leakage Distinction:</strong><br>
-        The feature <code>duration</code> represents the length of the phone call in seconds. While highly predictive (r ≈ 0.39), 
-        <strong>call duration is completely unknown before dialing the customer</strong>. 
-        This dashboard supports two distinct operational modes:
-        <ul>
-            <li><strong>Pre-Call Lead Prioritization (15 features):</strong> Evaluates potential subscribers before contact is initiated.</li>
-            <li><strong>Post-Call Outcome Audit (16 features):</strong> Benchmarks customer intent immediately after call completion.</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Key Analytics Tabs
-    tab1, tab2 = st.tabs(["📈 Class Distribution & EDA", "🏆 Model Performance Summary"])
-
-    with tab1:
-        c1, c2 = st.columns(2)
-        with c1:
-            if os.path.exists("reports/figures/target_distribution.png"):
-                st.image("reports/figures/target_distribution.png", caption="Target Class Imbalance (88.3% No vs 11.7% Yes)", use_container_width=True)
-            else:
-                st.info("Target distribution chart will appear once EDA script runs.")
-        with c2:
-            if os.path.exists("reports/figures/duration_leakage_analysis.png"):
-                st.image("reports/figures/duration_leakage_analysis.png", caption="Empirical Demonstration of Duration Leakage", use_container_width=True)
-            else:
-                st.info("Duration leakage chart will appear once EDA script runs.")
-
-    with tab2:
-        if df_comp is not None:
-            st.dataframe(
-                df_comp[["Model", "Type", "Features", "PR-AUC", "ROC-AUC", "F1-Score (0.5)", "Val-Optimized Thresh", "F1-Score (Opt Thresh)", "Training Time (s)"]],
-                use_container_width=True
-            )
+    best = df_comp.sort_values("PR-AUC", ascending=False).iloc[0] if df_comp is not None and not df_comp.empty else None
+    cards = [
+        ("CUSTOMER RECORDS", "45,211", "Historical campaign observations"),
+        ("SUBSCRIPTION RATE", "11.7%", "5,289 customers subscribed"),
+        ("TOP MODEL · TEST PR-AUC", str(best["Model"]) if best is not None else "Unavailable", "Ranked by precision-recall area"),
+        ("BEST PR-AUC", f'{best["PR-AUC"]:.3f}' if best is not None else "—", "Measured on held-out test data"),
+    ]
+    for col, (title, value, detail) in zip(st.columns(4), cards):
+        col.markdown(f'<div class="metric-card"><div class="metric-title">{title}</div><div class="metric-value">{escape(value)}</div><div class="metric-sub">{detail}</div></div>', unsafe_allow_html=True)
+    left, right = st.columns([1.65, 1])
+    with left:
+        st.subheader("Model leaderboard")
+        st.caption("Test PR-AUC · higher is better")
+        if best is not None:
+            ranked = df_comp.sort_values("PR-AUC")
+            fig = px.bar(ranked, x="PR-AUC", y="Model", orientation="h", text="PR-AUC", color_discrete_sequence=["#278669"])
+            fig.update_traces(texttemplate="%{x:.3f}", textposition="outside", textfont_color="#3e5b4e", marker_line_width=0)
+            fig.update_xaxes(range=[0, float(ranked["PR-AUC"].max()) * 1.18], title=None, gridcolor="#edf1ef")
+            fig.update_yaxes(title=None)
+            st.plotly_chart(chart_style(fig, 390), use_container_width=True, theme=None)
         else:
-            st.info("Evaluation results loading... Run `python -m src.evaluate` to generate initial tables.")
+            st.info("No evaluation results are available yet.")
+    with right:
+        st.subheader("Audience snapshot")
+        st.caption("Historical subscription outcomes")
+        fig = go.Figure(go.Pie(labels=["Subscribed", "Did not subscribe"], values=[5289, 39922], hole=.76,
+                               marker=dict(colors=["#278669", "#e7eeea"]), textinfo="none", sort=False))
+        fig.update_layout(annotations=[dict(text="<b>11.7%</b><br>subscribed", x=.5, y=.5, showarrow=False, font_size=24)],
+                          legend=dict(orientation="h", y=-.06, x=.5, xanchor="center"))
+        st.plotly_chart(chart_style(fig, 390), use_container_width=True, theme=None)
+    st.markdown('<div class="leakage-box"><strong>Choose the right moment to score.</strong> Use pre-call models to prioritize leads. Post-call models include call duration, which is only available after a conversation ends.</div>', unsafe_allow_html=True)
 
 # ==============================================================================
 # PAGE 2: CUSTOMER PREDICTION
 # ==============================================================================
-elif choice == "🎯 Customer Prediction":
-    st.title("🎯 Individual Customer Prediction")
+elif choice == "Customer prediction":
+    st.title("Customer prediction")
     st.markdown("Score an individual prospect for term deposit subscription using trained neural networks or traditional models.")
 
     # Mode Selector
@@ -271,7 +133,7 @@ elif choice == "🎯 Customer Prediction":
         "Medium ANN", "Advanced ANN", "Baseline ANN", "XGBoost", "Random Forest", "Logistic Regression"
     ]
     if is_pre_call:
-        available_models = ["Pre-call ANN (No Duration)", "Pre-call XGBoost (No Duration)"] + available_models
+        available_models = ["Pre-call ANN (No Duration)", "Pre-call XGBoost (No Duration)"]
 
     with mode_col2:
         selected_model = st.selectbox("Select Model Architecture", available_models)
@@ -284,7 +146,7 @@ elif choice == "🎯 Customer Prediction":
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            st.markdown("##### 👤 Client Demographics")
+            st.markdown("#####  Client Demographics")
             age = st.number_input("Age", min_value=18, max_value=100, value=38)
             job = st.selectbox("Occupation", [
                 "management", "technician", "entrepreneur", "blue-collar", "retired",
@@ -295,7 +157,7 @@ elif choice == "🎯 Customer Prediction":
             default = st.selectbox("Has Credit in Default?", ["no", "yes", "unknown"])
 
         with col2:
-            st.markdown("##### 💳 Financial & Account Details")
+            st.markdown("#####  Financial & Account Details")
             balance = st.number_input("Yearly Average Balance (€)", min_value=-10000, max_value=150000, value=2500)
             housing = st.selectbox("Has Housing Loan?", ["yes", "no", "unknown"])
             loan = st.selectbox("Has Personal Loan?", ["no", "yes", "unknown"])
@@ -305,7 +167,7 @@ elif choice == "🎯 Customer Prediction":
             ])
 
         with col3:
-            st.markdown("##### 📞 Campaign History")
+            st.markdown("#####  Campaign History")
             day = st.slider("Last Contact Day of Month", min_value=1, max_value=31, value=15)
             campaign = st.number_input("Contacts in Current Campaign", min_value=1, max_value=50, value=1)
             pdays = st.number_input("Days Since Prev Campaign (-1 if never)", min_value=-1, max_value=900, value=-1)
@@ -317,7 +179,7 @@ elif choice == "🎯 Customer Prediction":
             else:
                 duration = 0  # not used in pre-call
 
-        submitted = st.form_submit_button("⚡ Predict Subscription Probability", use_container_width=True)
+        submitted = st.form_submit_button(" Predict Subscription Probability", use_container_width=True)
 
     if submitted:
         customer_payload = {
@@ -347,12 +209,12 @@ elif choice == "🎯 Customer Prediction":
                 fig = go.Figure(go.Indicator(
                     mode="gauge+number",
                     value=prob * 100,
-                    number={'suffix': "%", 'font': {'size': 40, 'color': "#38bdf8"}},
-                    title={'text': "Subscription Probability", 'font': {'size': 18, 'color': "#f8fafc"}},
+                    number={'suffix': "%", 'font': {'size': 40, 'color': "#15745b"}},
+                    title={'text': "Subscription Probability", 'font': {'size': 18, 'color': "#173e31"}},
                     gauge={
                         'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "#94a3b8"},
-                        'bar': {'color': "#38bdf8"},
-                        'bgcolor': "#1e293b",
+                        'bar': {'color': "#15745b"},
+                        'bgcolor': "#edf2ef",
                         'borderwidth': 2,
                         'bordercolor': "gray",
                         'steps': [
@@ -366,15 +228,15 @@ elif choice == "🎯 Customer Prediction":
                         }
                     }
                 ))
-                fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"}, height=260, margin=dict(l=20, r=20, t=30, b=20))
-                st.plotly_chart(fig, use_container_width=True)
+                fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", font={'color': '#173e31'}, height=260, margin=dict(l=20, r=20, t=30, b=20))
+                st.plotly_chart(fig, use_container_width=True, theme=None)
 
             with res_col2:
                 if label == "yes":
                     st.markdown("""
                     <div style="background: rgba(16, 185, 129, 0.2); border: 2px solid #10b981; border-radius: 12px; padding: 20px; margin-top: 15px;">
-                        <h3 style="color: #34d399; margin: 0;">✅ Likely to Subscribe</h3>
-                        <p style="color: #e2e8f0; margin-top: 8px;">
+                        <h3 style="color: #15745b; margin: 0;"> Likely to Subscribe</h3>
+                        <p style="color: #385447; margin-top: 8px;">
                             The predicted probability exceeds the active threshold. This customer represents a prime marketing prospect.
                         </p>
                     </div>
@@ -382,14 +244,14 @@ elif choice == "🎯 Customer Prediction":
                 else:
                     st.markdown("""
                     <div style="background: rgba(239, 68, 68, 0.15); border: 2px solid #ef4444; border-radius: 12px; padding: 20px; margin-top: 15px;">
-                        <h3 style="color: #f87171; margin: 0;">❌ Unlikely to Subscribe</h3>
-                        <p style="color: #e2e8f0; margin-top: 8px;">
+                        <h3 style="color: #a93939; margin: 0;"> Unlikely to Subscribe</h3>
+                        <p style="color: #385447; margin-top: 8px;">
                             The probability is below the threshold. Recommend prioritizing other leads or tailoring a specialized promotional offer.
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
 
-                st.caption("⚠️ **Disclaimer:** Machine learning predictions estimate historical likelihood and do not guarantee individual customer decisions.")
+                st.caption(" **Disclaimer:** Machine learning predictions estimate historical likelihood and do not guarantee individual customer decisions.")
 
         except Exception as e:
             st.error(f"Prediction failed: {str(e)}")
@@ -397,8 +259,8 @@ elif choice == "🎯 Customer Prediction":
 # ==============================================================================
 # PAGE 3: MODEL COMPARISON
 # ==============================================================================
-elif choice == "📊 Model Comparison":
-    st.title("📊 Rigorous Model Comparison")
+elif choice == "Model comparison":
+    st.title("Model comparison")
     st.markdown("All configurations evaluated strictly on the **same untouched 15% test set** (6,782 samples).")
 
     df_comp = load_comparison_data()
@@ -410,67 +272,67 @@ elif choice == "📊 Model Comparison":
 
         with col1:
             if os.path.exists("reports/figures/pr_curves_comparison.png"):
-                st.image("reports/figures/pr_curves_comparison.png", caption="Precision-Recall Curves (Primary Metric for Imbalance)", use_container_width=True)
+                st.image("reports/figures/pr_curves_comparison.png", caption="Precision-Recall Curves (Primary Metric for Imbalance)", use_column_width=True)
             else:
                 st.info("PR curves figure will be displayed after evaluation completes.")
 
         with col2:
             if os.path.exists("reports/figures/roc_curves_comparison.png"):
-                st.image("reports/figures/roc_curves_comparison.png", caption="Receiver Operating Characteristic (ROC) Curves", use_container_width=True)
+                st.image("reports/figures/roc_curves_comparison.png", caption="Receiver Operating Characteristic (ROC) Curves", use_column_width=True)
             else:
                 st.info("ROC curves figure will be displayed after evaluation completes.")
 
         col3, col4 = st.columns(2)
         with col3:
             if os.path.exists("reports/figures/model_metrics_comparison.png"):
-                st.image("reports/figures/model_metrics_comparison.png", caption="Benchmark Metrics (PR-AUC, ROC-AUC, F1, Recall)", use_container_width=True)
+                st.image("reports/figures/model_metrics_comparison.png", caption="Benchmark Metrics (PR-AUC, ROC-AUC, F1, Recall)", use_column_width=True)
         with col4:
             if os.path.exists("reports/figures/ann_learning_curves.png"):
-                st.image("reports/figures/ann_learning_curves.png", caption="ANN Architectures Training & Validation Loss Curves", use_container_width=True)
+                st.image("reports/figures/ann_learning_curves.png", caption="ANN Architectures Training & Validation Loss Curves", use_column_width=True)
 
         if os.path.exists("reports/figures/confusion_matrices.png"):
-            st.image("reports/figures/confusion_matrices.png", caption="Confusion Matrix Grid Across All Architectures", use_container_width=True)
+            st.image("reports/figures/confusion_matrices.png", caption="Confusion Matrix Grid Across All Architectures", use_column_width=True)
     else:
         st.info("Model comparison CSV not found. Please train and evaluate models first.")
 
 # ==============================================================================
 # PAGE 4: EXPLAINABILITY & SHAP
 # ==============================================================================
-elif choice == "🔍 Explainability & SHAP":
-    st.title("🔍 Model Explainability & Interpretability")
+elif choice == "Explainability":
+    st.title("Understand the predictions")
     st.markdown("""
-    Black-box neural networks and ensemble models must be demystified for regulated financial environments. 
-    We deploy **SHAP (SHapley Additive exPlanations)** and **Permutation Importance** to inspect both global feature relevance 
+    Black-box neural networks and ensemble models must be demystified for regulated financial environments.
+    We deploy **SHAP (SHapley Additive exPlanations)** and **Permutation Importance** to inspect both global feature relevance
     and local individual decision drivers.
     """)
 
     col1, col2 = st.columns(2)
     with col1:
         if os.path.exists("reports/figures/shap_summary_plot.png"):
-            st.image("reports/figures/shap_summary_plot.png", caption="SHAP Global Summary Plot (Beeswarm)", use_container_width=True)
+            st.image("reports/figures/shap_summary_plot.png", caption="SHAP Global Summary Plot (Beeswarm)", use_column_width=True)
         else:
             st.info("Run `python -m src.explainability` to generate SHAP summary plots.")
 
     with col2:
         if os.path.exists("reports/figures/aggregated_feature_comparison.png"):
-            st.image("reports/figures/aggregated_feature_comparison.png", caption="Original Feature Importance: XGBoost vs Medium ANN", use_container_width=True)
+            st.image("reports/figures/aggregated_feature_comparison.png", caption="Original Feature Importance: XGBoost vs Medium ANN", use_column_width=True)
         else:
             st.info("Aggregated importance plot will appear once explainability runs.")
 
     st.markdown("<div class='section-header'>Probability Calibration Analysis</div>", unsafe_allow_html=True)
     if os.path.exists("reports/figures/calibration_curves.png"):
-        st.image("reports/figures/calibration_curves.png", caption="Reliability Curves (Comparing Predicted Probabilities to Empirical Subscription Frequencies)", use_container_width=True)
+        st.image("reports/figures/calibration_curves.png", caption="Reliability Curves (Comparing Predicted Probabilities to Empirical Subscription Frequencies)", use_column_width=True)
 
     st.markdown("""
-    > **⚠️ Interpretability Note:** Feature importance and SHAP attribution measure mathematical predictive association within the trained model. 
+    > ** Interpretability Note:** Feature importance and SHAP attribution measure mathematical predictive association within the trained model.
     > They do not establish causal relationships (e.g., forcing a customer to speak longer on the phone does not artificially cause them to purchase a term deposit).
     """)
 
 # ==============================================================================
 # PAGE 5: BATCH PREDICTION
 # ==============================================================================
-elif choice == "📁 Batch Prediction":
-    st.title("📁 Batch Prospect Scoring")
+elif choice == "Batch scoring":
+    st.title("Batch scoring")
     st.markdown("Upload a CSV of marketing leads to score an entire campaign in bulk.")
 
     batch_mode = st.radio("Prediction Mode", ["Post-Call (16 features)", "Pre-Call (15 features, duration excluded)"])
@@ -480,16 +342,28 @@ elif choice == "📁 Batch Prediction":
 
     col_btn1, col_btn2 = st.columns([1, 3])
     with col_btn1:
-        load_sample = st.button("📥 Load Sample Leads Batch (15 rows)")
+        load_sample = st.button(
+            "Load Sample Leads Batch (15 rows)",
+            disabled=uploaded_file is not None,
+            help="Remove the uploaded file to use sample leads."
+        )
 
-    df_batch = None
+    df_batch = st.session_state.get("batch_input")
     if load_sample:
-        from src.data_loader import load_raw_data
-        df_full = load_raw_data("data/bank-full.csv", sep=";")
-        df_batch = df_full.head(15).drop(columns=["y"]).copy()
-        st.success("Loaded 15 sample records from UCI dataset!")
+        try:
+            from src.data_loader import load_raw_data
+            df_full = load_raw_data("data/bank-full.csv", sep=";")
+            df_batch = df_full.head(15).drop(columns=["y"]).copy()
+            st.session_state["batch_input"] = df_batch
+            st.session_state.pop("batch_results", None)
+            st.success("Loaded 15 sample records from UCI dataset!")
+        except Exception as e:
+            df_batch = None
+            st.error(f"Could not load sample leads: {e}")
 
     elif uploaded_file is not None:
+        # Never fall back to old sample leads when a new upload is invalid.
+        df_batch = None
         try:
             # Try comma first, then semicolon
             uploaded_file.seek(0)
@@ -501,47 +375,53 @@ elif choice == "📁 Batch Prediction":
         except Exception as e:
             st.error(f"Error reading CSV: {e}")
 
-    if df_batch is not None:
+    if df_batch is not None and df_batch.empty:
+        st.warning("This CSV has no customer rows. Upload a file with at least one customer.")
+
+    if df_batch is not None and not df_batch.empty:
+        batch_key = (hashlib.sha256(df_batch.to_csv(index=False).encode("utf-8")).hexdigest(), b_mode_key)
+        if st.session_state.get("batch_result_key") != batch_key:
+            st.session_state.pop("batch_results", None)
         st.markdown("##### Preview Input Data:")
         st.dataframe(df_batch.head(5), use_container_width=True)
 
-        if st.button("🚀 Score Entire Batch", use_container_width=True):
+        if st.button(" Score Entire Batch", use_container_width=True):
             try:
                 predictor = get_predictor()
                 model_to_use = "Pre-call ANN (No Duration)" if b_mode_key == "pre_call" else "Medium ANN"
                 res = predictor.predict(df_batch, model_name=model_to_use, mode=b_mode_key)
-                scored_df = res["results_dataframe"]
-
-                st.markdown("<div class='section-header'>Scoring Results</div>", unsafe_allow_html=True)
-                st.dataframe(scored_df, use_container_width=True)
-
-                num_pos = (scored_df["predicted_subscription"] == "yes").sum()
-                st.metric("Total Prospects Identified to Subscribe", f"{num_pos} of {len(scored_df)}", f"{num_pos/len(scored_df):.1%}")
-
-                # Download button
-                csv_bytes = scored_df.to_csv(index=False).encode("utf-8")
-                st.download_button(
-                    label="💾 Download Scored Results as CSV",
-                    data=csv_bytes,
-                    file_name="bank_marketing_scored_leads.csv",
-                    mime="text/csv",
-                    use_container_width=True
-                )
+                st.session_state["batch_results"] = res["results_dataframe"]
+                st.session_state["batch_result_key"] = batch_key
             except Exception as e:
+                st.session_state.pop("batch_results", None)
                 st.error(f"Batch prediction failed: {str(e)}")
+
+        if "batch_results" in st.session_state:
+            scored_df = st.session_state["batch_results"]
+            st.markdown("<div class='section-header'>Scoring Results</div>", unsafe_allow_html=True)
+            st.dataframe(scored_df, use_container_width=True)
+            num_pos = (scored_df["predicted_subscription"] == "yes").sum()
+            st.metric("Total Prospects Identified to Subscribe", f"{num_pos} of {len(scored_df)}", f"{num_pos/len(scored_df):.1%}")
+            st.download_button(
+                label="Download Scored Results as CSV",
+                data=scored_df.to_csv(index=False).encode("utf-8"),
+                file_name="bank_marketing_scored_leads.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
 
 # ==============================================================================
 # PAGE 6: DATASET & ARCHITECTURE
 # ==============================================================================
-elif choice == "📖 Dataset & Architecture":
-    st.title("📖 Dataset, Architecture & Methodology")
+elif choice == "Data & methodology":
+    st.title("Data & methodology")
 
     st.markdown("""
     ### 1. Dataset Provenance & Citation
     - **Source:** [UCI Machine Learning Repository - Bank Marketing](https://archive.ics.uci.edu/dataset/222/bank+marketing)
     - **Authors:** Sérgio Moro, Paulo Cortez, and Paulo Rita (2011/2014)
     - **Volume:** 45,211 direct telemarketing campaign contacts between May 2008 and November 2010.
-    
+
     ### 2. Feature Dictionary
     | Feature | Type | Description |
     | :--- | :--- | :--- |
@@ -556,7 +436,7 @@ elif choice == "📖 Dataset & Architecture":
     | `contact` | Categorical | Contact communication type (cellular, telephone, unknown) |
     | `day` | Numeric | Last contact day of the month (1 - 31) |
     | `month` | Categorical | Last contact month of year (jan - dec) |
-    | `duration` | Numeric | Last contact duration in seconds (⚠️ Target leakage warning) |
+    | `duration` | Numeric | Last contact duration in seconds ( Target leakage warning) |
     | `campaign` | Numeric | Number of contacts during this campaign for this client |
     | `pdays` | Numeric | Days since last campaign contact (-1 means never contacted) |
     | `previous` | Numeric | Contacts before current campaign |
@@ -564,9 +444,9 @@ elif choice == "📖 Dataset & Architecture":
     | `y` | Binary Target | Has client subscribed to term deposit? (yes, no) |
 
     ### 3. Neural Network Architectures Tested
-    1. **Baseline ANN:** Input(51) ➔ Dense(64, ReLU) ➔ Dense(1, Sigmoid)
-    2. **Medium ANN:** Input(51) ➔ Dense(128, ReLU) ➔ Dropout(0.3) ➔ Dense(64, ReLU) ➔ Dense(1, Sigmoid)
-    3. **Advanced ANN:** Input(51) ➔ Dense(256, ReLU) ➔ BatchNorm ➔ Dropout(0.3) ➔ Dense(128, ReLU) ➔ BatchNorm ➔ Dropout(0.2) ➔ Dense(64, ReLU) ➔ Dense(1, Sigmoid)
+    1. **Baseline ANN:** Input(51)  Dense(64, ReLU)  Dense(1, Sigmoid)
+    2. **Medium ANN:** Input(51)  Dense(128, ReLU)  Dropout(0.3)  Dense(64, ReLU)  Dense(1, Sigmoid)
+    3. **Advanced ANN:** Input(51)  Dense(256, ReLU)  BatchNorm  Dropout(0.3)  Dense(128, ReLU)  BatchNorm  Dropout(0.2)  Dense(64, ReLU)  Dense(1, Sigmoid)
     4. **Tuned ANN:** Optuna-optimized layer depths, units, regularization, and class-weighting.
 
     ### 4. Leakage Prevention Protocol
@@ -576,4 +456,4 @@ elif choice == "📖 Dataset & Architecture":
     """)
 
     st.markdown("---")
-    st.caption("Developed by Senior ML / Deep Learning Engineer for BTech CSE Internship Portfolio.")
+    st.caption("Verdant / Bank marketing research workspace")

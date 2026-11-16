@@ -5,6 +5,7 @@ Maintains cached model artifacts and ensures consistent preprocessing.
 import os
 import pandas as pd
 import numpy as np
+from sklearn.linear_model import LogisticRegression
 from typing import Dict, Any, List, Union, Optional
 
 # Enforce torch backend for Keras 3
@@ -88,6 +89,13 @@ class BankPredictor:
             model = load_keras_model_by_name(model_name, input_dim, path, self.artifacts_dir)
         else:
             model = load_joblib(path)
+            # Newer sklearn artifacts omit multi_class; older runtimes still
+            # read it in predict_proba. Binary logistic regression uses OvR.
+            if (isinstance(model, LogisticRegression)
+                    and "multi_class" in LogisticRegression().get_params()
+                    and not hasattr(model, "multi_class")
+                    and len(model.classes_) == 2):
+                model.multi_class = "ovr"
 
         self._models[model_name] = (model, is_keras)
         return self._models[model_name]
